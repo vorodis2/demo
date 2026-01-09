@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>JoltPhysics js 3d</title>
+    <script src='src/lib/divLib.js'></script>
+    <script src='src/lib/jquery-1.11.3.js'></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-30708630-1"></script>
+</head>
+<meta name="viewport" content="width=device-width,height=device-height,user-scalable=no user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+<script type="module">
+    import Stats from './src/lib/stats.module.js';
+	//import Stats from 'three/addons/libs/stats.module.js';
+	var dcmParam, stats,dCont1,gallety,panel,dCont2,dCont3,iframe,editor,bZam,bZam1,bZam2,panel1,panel2,label;
+
+	
+	//var trace = window.console.log.bind(window.console);
+	var otstup=2;
+
+	var boolCod=false;
+	var boolCod1=false;
+	const style = document.createElement('style');
+	  style.textContent = `
+	    #editor {	      
+	      font-family: monospace;
+	      font-size: 10px;
+	      background: #fefefe;
+	      color: #848484;
+	      border: 1px solid #ccc;
+	      padding: 3px;
+	      white-space: pre-wrap;
+	      overflow: auto;
+	    }
+	   
+	  `;
+	  document.head.appendChild(style)
+
+
+
+	function sizeWindow () {
+		var w = document.documentElement.clientWidth;
+		var h = document.documentElement.clientHeight;
+			
+
+		gallety.height=h-otstup*2-96
+
+
+
+
+		dCont1.x=otstup;
+		dCont1.y=h-otstup*2-45;
+
+		dCont2.x=gallety.width+otstup*2;
+		dCont2.y=otstup;
+
+
+ 
+		if(boolCod==false){
+			
+
+			panel.width=Math.round(w-dCont2.x-otstup);
+			panel.height=Math.round(h-otstup*2);
+
+
+
+		}else{
+			let ww=w-dCont2.x-otstup*2
+			panel.width=Math.round(ww/2);
+			panel.height=Math.round(h-otstup*2);
+
+			dCont3.x=panel.width+panel.x+dCont2.x+otstup
+			dCont3.y=otstup;
+			panel1.width=Math.round(ww/2-otstup);
+			panel1.height=Math.round(h-otstup*2);
+			//buttonNa.width=panel1.width-otstup*2
+			let hh=(otstup*2 )
+			editor.style.left = (otstup)+'px';
+        	editor.style.top = hh+'px';
+        	editor.style.width=Math.round(panel1.width-otstup*4)+"px";
+        	editor.style.height=(h-hh-otstup*8)+"px";
+
+		}		
+
+		panel2.width=panel.width
+		label.width=panel2.width-otstup*2
+
+
+
+		iframe.style.width=panel.width+"px";
+		iframe.style.height=panel.height+"px";
+		
+		stats.domElement.style.position = 'fixed';
+        stats.domElement.style.top = '0px';
+        stats.domElement.style.left = '0px';
+
+
+        bZam.x=w-bZam.width-otstup*2
+		bZam.y=bZam1.y=bZam2.y=h-bZam.width-otstup*2
+
+		bZam1.x=bZam.x-bZam.width-otstup*2
+		bZam2.x=bZam1.x-bZam.width-otstup*2
+
+		ggggg()	
+
+	}
+
+
+
+
+
+	function upDate() {
+		stats.update();
+		requestAnimationFrame( upDate );	
+
+	}
+
+	function ggggg() {
+		for (var i = 0; i < gallety.array.length; i++) {
+			gallety.array[i].image.y=otstup	
+			gallety.array[i].label.textAlign='left'
+			gallety.array[i].label.fontSize=10;
+			gallety.array[i].label.x=2;
+			gallety.array[i].label.y=gallety.array[i].image.height+otstup*2		
+		}
+	}
+
+
+	function init(t){
+		let a=[];
+
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'UA-30708630-1');
+
+		
+		if(getURLParameters('a')){
+			boolCod = true
+			boolCod1 = true;
+		}
+
+		$.post(
+            "src/component/MHBDPHP.php", 
+            {tip:"getFiles1", dir:"../../"}, 
+            function(data){ 
+            
+            	let aa=JSON.parse(data)            
+            	for (var i = aa.length- 1; i >= 0; i--) {            				
+            		if(typeof aa[i] =='string'){
+            		
+            			if(aa[i]!=='index.html'){            				
+							let aaa=aa[i].split('.')
+	            			if(aaa[aaa.length-1]=='html'){  
+	            				a.push({title:aaa[0], link:aa[i],src:"resources/icon/"+aaa[0]+'.png'})
+	            			}
+            			}            			
+            		} 
+            	}
+               	init1(a)
+            }
+        );
+	}
+
+	var arrayParm
+	function init1(a){		
+		arrayParm=a;
+		dcmParam=new DCM()
+		dcmParam.zbrosDokument=false
+		dcmParam.fontFamily='monospace'
+		var contentHTML= document.createElement(
+			'div'
+		);// dsds
+	 	contentHTML.style.position = 'fixed';
+		contentHTML.style.top = '0px';			
+		contentHTML.style.left = '0px';
+		document.body.appendChild(contentHTML); 
+		let dCont=new DCont(contentHTML)
+
+
+        let pp=new DPanel(dCont)
+        	
+        let bb=new DButton(pp, otstup,otstup," ",function(){
+       
+        	window.open(window.location.origin);
+        
+
+        },'resources/icon/sss.png')	
+
+        bb.scalePic=0.20
+        bb.boolFond=false
+        pp.height=45
+
+        let ll=new DLabel(pp,otstup,otstup*2+bb.height,"vorodis2@gmail.com")
+        ll.fontSize=10
+
+
+		gallety = new DGallery(dCont,otstup, pp.height+otstup*2,function(){
+			setIndex(gallety.index)
+		});
+		gallety.width=104;
+		gallety.widthPic=gallety.width-otstup*2
+		gallety.heightPic=gallety.width+10
+
+		pp.width=gallety.width
+
+
+		gallety.otstup=otstup
+		gallety.kolII=1
+		gallety.start(a);
+
+
+		ggggg()
+		setTimeout(ggggg,1)		
+		setTimeout(ggggg,300)
+		setTimeout(ggggg,1000)
+
+		stats = new Stats();
+		stats.setMode(0);
+        stats.domElement.style.position = 'fixed';
+        stats.domElement.style.top = '0px';
+        stats.domElement.style.left = '0px';
+        dCont1=new DCont(dCont)		
+		dCont1.div.appendChild( stats.domElement );
+		
+
+		///////////
+		dCont2=new DCont(dCont)	
+		panel2=new DPanel(dCont2)	
+		label=new DLabel(panel2,otstup,panel2,"---a gas sdgasfdgf adsgfgf as--")
+		label.fontSize=10
+		panel2.height=(label.fontSize)*2+otstup*2		
+		panel=new DPanel(dCont2,0,panel2.height+otstup)
+
+
+
+
+
+		iframe = document.createElement("IFRAME");        
+        iframe.style.position = 'fixed';
+        iframe.style.top = '0px';
+        iframe.style.left = '0px';
+        iframe.style.width="500px";
+        iframe.style.height="300px";
+        iframe.style.border= '0px solid';
+        panel.div.appendChild(iframe);	
+
+
+		dCont3 = new DCont(dCont)
+		panel1=new DPanel(dCont3)
+
+
+
+        editor = document.createElement('div');
+        editor.style.position = 'fixed';
+        
+		editor.style.top = otstup+'px';
+        editor.style.left = otstup+'px';
+        editor.style.width="500px";
+        editor.style.height="300px";
+  		editor.id = 'editor';
+  		editor.contentEditable = true;
+  		editor.textContent = // Пример кода
+
+  		// Подсвечиваем при изменении (можно debounce)
+		editor.addEventListener('input', () => {
+		   //setTimeout(highlight, 50);
+			//buttonNa.activMouse=true
+		});	
+
+		// Вставка таба и автоотступ
+	    editor.addEventListener('keydown', function(e) {
+		    if (e.key === 'Tab') {
+		      e.preventDefault();
+		      insertAtCursor("  ");
+		    }
+		    if (e.key === 'Enter') {
+		      e.preventDefault();
+		      insertAtCursor("\n  ");
+		    }
+	    });
+
+
+
+  		panel1.div.appendChild(editor);
+  		
+
+  		bZam=new DButton(dCont, 0,0," ",function(){
+			boolCod=!boolCod
+			boolCod1=true;
+			creatUrl()
+			dragBC()
+			sizeWindow();
+		},'resources/image/1.svg')
+		bZam.wh=32
+		bZam.borderRadius=bZam.wh/2
+		bZam.color=dcmParam.getColor(dcmParam.color1)
+  		bZam.colorText=dcmParam.getColor(bZam.color)
+  		bZam.image.alpha=0.5
+  		bZam.otPic=5
+
+
+  		bZam1=new DButton(dCont, 0,0," ",function(){
+			let s='https://github.com/vorodis2/joltPhysicsTest/blob/main/'+arrayParm[gallety.index].link;
+			window.open(s);
+		},'resources/image/2.svg')
+		bZam1.wh=32
+		bZam1.borderRadius=bZam1.wh/2
+		bZam1.color=dcmParam.getColor(dcmParam.color1)
+  		bZam1.colorText=dcmParam.getColor(bZam1.color)
+  		bZam1.image.alpha=0.5
+  		bZam1.otPic=5
+
+  		bZam2=new DButton(dCont, 0,0," ",function(){
+
+  			var sURL = window.document.URL.toString();
+			let aa=sURL.split("?");
+			let s = aa[0]+""+arrayParm[gallety.index].link;  			
+			window.open(s);
+		},'resources/image/3.svg')
+		bZam2.wh=32
+		bZam2.borderRadius=bZam2.wh/2
+		bZam2.color=dcmParam.getColor(dcmParam.color1)
+  		bZam2.colorText=dcmParam.getColor(bZam2.color)
+  		bZam2.image.alpha=0.5
+  		bZam2.otPic=5
+		highlight()	
+        let pos=0;
+        let nn=getURLParameters("n")
+        if(nn){
+        	for (let i = 0; i < a.length; i++) {
+        		if(a[i].title==nn){
+        			pos=i;
+        		}
+        	}
+        }
+
+
+
+
+   
+
+
+
+
+
+        dragBC()
+        setIndex(pos)
+		upDate()
+		setTimeout(function() {sizeWindow()}, 10);
+		window.onresize = sizeWindow;
+		sizeWindow();	
+
+
+	}
+
+
+	async function getTitleFromHtml(url) {
+	  const response = await fetch(url);
+	  const htmlText = await response.text();
+
+	  const parser = new DOMParser();
+	  const doc = parser.parseFromString(htmlText, "text/html");
+
+	  const title = doc.querySelector("title");
+	  return title ? title.textContent : null;
+	}
+
+
+
+	function dragBC() {
+
+		if(boolCod){
+			dCont3.visible = true
+		}else{
+			dCont3.visible = false
+		}
+	}
+
+
+	function setIndex(ii){	
+		gallety.index=ii;		
+		iframe.src=arrayParm[ii].link;
+
+
+
+
+	//	buttonNa.activMouse=false
+		$.ajax({
+		    type:    "GET",
+		    url:     arrayParm[ii].link,
+		    success: function(text) {
+		    
+		        editor.textContent =text
+		        highlight()	
+		//        buttonNa.activMouse=false
+		    },
+		    error:   function() {
+		        // An error occurred
+		    }
+		});
+
+		creatUrl()
+		
+		// Пример использования:
+		getTitleFromHtml(iframe.src).then(title => {
+		  	console.log("Title:", title);
+		  	label.text=title;
+		  	setTimeout(function() {
+		  		let hh=label.getRect().height+otstup;
+		  		panel2.height=hh	
+				panel.y=panel2.height+otstup
+				sizeWindow();
+				ggggg()
+		  	}, 10);
+		});
+	}
+
+	function creatUrl(){
+		var sURL = window.document.URL.toString();
+		let aa=sURL.split("?");
+		let uu=aa[0]+"?n="+arrayParm[gallety.index].title;
+
+		if(boolCod1 && boolCod){
+			uu+="&a=1"
+		}
+
+		history.pushState(null, null, uu);
+		//window.location.href = uu;
+	}
+
+
+
+	
+		//customDepth+trasparent
+	function getURLParameters(paramName){
+        var sURL = window.document.URL.toString();
+		var arrParams = sURL.split("/");  			    		
+        if (sURL.indexOf("?") > 0) {
+			var arrParams = sURL.split("?");
+        	var arrURLParams = arrParams[1].split("&");
+       	 	var arrParamNames = new Array(arrURLParams.length);
+        	var arrParamValues = new Array(arrURLParams.length);
+
+            arrParams = sURL.split("?");
+            arrURLParams = arrParams[1].split("&");
+            arrParamNames = new Array(arrURLParams.length);
+            arrParamValues = new Array(arrURLParams.length);
+
+
+            var i = 0;
+            for (i = 0; i < arrURLParams.length; i++) {
+
+                var sParam =  arrURLParams[i].split("=");
+                arrParamNames[i] = sParam[0];
+                if (sParam[1] != "")
+                    arrParamValues[i] = unescape(sParam[1]);
+                else
+                    arrParamValues[i] = null;
+            }
+
+            for (i=0; i<arrURLParams.length; i++) {
+                if (arrParamNames[i] == paramName) {
+
+                    return arrParamValues[i];
+                }
+            }
+            return null;
+        }
+    }
+
+    /////////////////////////
+
+// Список ключевых слов
+  const keywords = ['function', 'return', 'if', 'else', 'for', 'while', 'var', 'let', 'const', 'true', 'false'];
+
+  // Простой парсер для подсветки
+  function highlight() {
+    /*let text = editor.textContent;
+
+    // Экранируем HTML
+    text = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Комментарии
+    text = text.replace(/(\/\/.*)/g, `<span class="comment">$1</span>`);
+
+    // Строки
+    text = text.replace(/(".*?"|'.*?')/g, `<span class="string">$1</span>`);
+
+    // Ключевые слова
+    for (const word of keywords) {
+      const reg = new RegExp('\\b' + word + '\\b', 'g');
+      text = text.replace(reg, `<span class="keyword">${word}</span>`);
+    }
+   
+    // Обновляем HTML
+    editor.innerHTML = text;
+    placeCursorAtEnd(editor);*/
+  }
+
+  
+
+  // Функция вставки текста на позицию курсора
+  function insertAtCursor(text) {
+    const sel = window.getSelection();
+    const range = sel.getRangeAt(0);
+    const node = document.createTextNode(text);
+    range.deleteContents();
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.setEndAfter(node);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // Сохраняем позицию курсора после подсветки
+  function placeCursorAtEnd(el) {
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+
+
+  // Первичная подсветка
+ // highlight();
+
+    ///////////////////////////
+
+
+	document.addEventListener("DOMContentLoaded", function() {
+		init();//строитель		
+	});
+
+
+
+
+</script>
+
+<body>
+</body>
+
+</html>
