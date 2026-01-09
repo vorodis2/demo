@@ -3,15 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>JoltPhysics js 3d</title>
+    <title>DEMO Vorodis2</title>
     <script src='src/lib/divLib.js'></script>
     <script src='src/lib/jquery-1.11.3.js'></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-30708630-1"></script>
 </head>
 <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 <script type="module">
-    import Stats from './src/lib/stats.module.js';
-	//import Stats from 'three/addons/libs/stats.module.js';
+    import Stats from './src/lib/stats.module.js';	
 	var dcmParam, stats,dCont1,gallety,panel,dCont2,dCont3,iframe,editor,bZam,bZam1,bZam2,panel1,panel2,label;
 
 	
@@ -36,14 +35,14 @@
 	  `;
 	  document.head.appendChild(style)
 
-
-
+	var whMane=150  
+	var op=45
 	function sizeWindow () {
 		var w = document.documentElement.clientWidth;
 		var h = document.documentElement.clientHeight;
 			
 
-		gallety.height=h-otstup*2-96
+		gallety.height= h-gallety.y-45-otstup*3;
 
 
 
@@ -101,7 +100,9 @@
 		bZam1.x=bZam.x-bZam.width-otstup*2
 		bZam2.x=bZam1.x-bZam.width-otstup*2
 
-		ggggg()	
+
+		gallety.scrollBarV.x=-5
+		ggggg();	
 
 	}
 
@@ -123,18 +124,18 @@
 			gallety.array[i].label.x=2;
 			gallety.array[i].label.y=gallety.array[i].image.height+otstup*2		
 		}
+		gallety.scrollBarV.x=-5
 	}
 
 
 	function init(t){
+
+
+
 		let a=[];
+		
 
-		window.dataLayer = window.dataLayer || [];
-		function gtag(){dataLayer.push(arguments);}
-		gtag('js', new Date());
-
-		gtag('config', 'UA-30708630-1');
-
+		
 		
 		if(getURLParameters('a')){
 			boolCod = true
@@ -145,11 +146,10 @@
             "src/component/MHBDPHP.php", 
             {tip:"getFiles1", dir:"../../"}, 
             function(data){ 
-            
+            	
             	let aa=JSON.parse(data)            
             	for (var i = aa.length- 1; i >= 0; i--) {            				
-            		if(typeof aa[i] =='string'){
-            		
+            		if(typeof aa[i] =='string'){            		
             			if(aa[i]!=='index.html'){            				
 							let aaa=aa[i].split('.')
 	            			if(aaa[aaa.length-1]=='html'){  
@@ -164,9 +164,21 @@
 	}
 
 	var arrayParm
-	function init1(a){		
+	function init1(a){	
+		
+
+
+
+
 		arrayParm=a;
 		dcmParam=new DCM()
+		if(dcmParam.mobile==true){
+			whMane=80
+		}
+		
+
+
+
 		dcmParam.zbrosDokument=false
 		dcmParam.fontFamily='monospace'
 		var contentHTML= document.createElement(
@@ -178,10 +190,10 @@
 		document.body.appendChild(contentHTML); 
 		let dCont=new DCont(contentHTML)
 
-
+		let yy=otstup
         let pp=new DPanel(dCont)
         	
-        let bb=new DButton(pp, otstup,otstup," ",function(){
+       /* let bb=new DButton(pp, otstup,otstup," ",function(){
        
         	window.open(window.location.origin);
         
@@ -189,32 +201,54 @@
         },'resources/icon/sss.png')	
 
         bb.scalePic=0.20
-        bb.boolFond=false
-        pp.height=45
+        bb.boolFond=false*/
+        
 
-        let ll=new DLabel(pp,otstup,otstup*2+bb.height,"vorodis2@gmail.com")
-        ll.fontSize=10
+        let ll1=new DLabel(pp,otstup,yy,"free 22$/hour 2222$/month")
+        ll1.fontSize=10;
+        ll1.activMouse=true;//userSelect='none';
+        ll1.width=whMane
+
+        pp.height=ll1.fontSize+otstup*2
+        if(dcmParam.mobile==true){	
+        	ll1.text="free 22$/hour"
+        }
 
 
-		gallety = new DGallery(dCont,otstup, pp.height+otstup*2,function(){
+		if(dcmParam.mobile==false){		
+
+	        let l=new DLabel(pp, otstup, yy,'1xxxxx1')
+	        l.fontSize=10
+	        l.width=190
+	        l.dCT.div.innerHTML  = '<br>website: <a href="https://vorodis2.info" target="_blank">vorodis2.info</a><br> emeil:   vorodis2@gmail.com <br>phone: +380951026557</br></br>';
+	        l.activMouse=true
+			pp.height=50
+
+			
+		}
+		
+		op=pp.height
+
+		gallety = new DGallery(dCont,otstup, pp.height+otstup,function(){
 			setIndex(gallety.index)
 		});
-		gallety.width=104;
-		gallety.widthPic=gallety.width-otstup*2
-		gallety.heightPic=gallety.width+10
+		gallety.width=whMane;
+		gallety.widthPic=gallety.width-otstup*2;
+		gallety.heightPic=gallety.width+10;
 
-		pp.width=gallety.width
-
-
-		gallety.otstup=otstup
-		gallety.kolII=1
+		pp.width=gallety.width;
+		gallety.scrollBarV.offsetHit=10;
+		gallety.scrollBarV.width=2;
+		gallety.otstup=otstup;
+		gallety.kolII=1;
 		gallety.start(a);
+		gallety.scrollBarV.x=-5;	
 
 
-		ggggg()
-		setTimeout(ggggg,1)		
-		setTimeout(ggggg,300)
-		setTimeout(ggggg,1000)
+		ggggg();
+		setTimeout(ggggg,1);		
+		setTimeout(ggggg,300);
+		setTimeout(ggggg,1000);
 
 		stats = new Stats();
 		stats.setMode(0);
@@ -302,7 +336,7 @@
 
 
   		bZam1=new DButton(dCont, 0,0," ",function(){
-			let s='https://github.com/vorodis2/joltPhysicsTest/blob/main/'+arrayParm[gallety.index].link;
+			let s='https://github.com/vorodis2/demo/blob/main/www/'+arrayParm[gallety.index].link;
 			window.open(s);
 		},'resources/image/2.svg')
 		bZam1.wh=32
@@ -335,13 +369,6 @@
         		}
         	}
         }
-
-
-
-
-   
-
-
 
 
 
@@ -380,10 +407,17 @@
 
 
 	function setIndex(ii){	
-		gallety.index=ii;		
+		
+		gallety.index=ii;
+		gallety.scrolPos(false);
+		console.warn("+++++++++++",ii, )				
 		iframe.src=arrayParm[ii].link;
-
-
+		setTimeout(function(){
+			//console.warn("+++++++++++",gallety.scrollBarV.value, gallety.content.y)
+			//gallety.korektPoIndex(ii)
+			gallety.scrolPos(false);
+		},10)
+		
 
 
 	//	buttonNa.activMouse=false
@@ -405,18 +439,21 @@
 		
 		// Пример использования:
 		getTitleFromHtml(iframe.src).then(title => {
-		  	console.log("Title:", title);
+		  	
 		  	label.text=title;
 		  	setTimeout(function() {
 		  		let hh=label.getRect().height+otstup;
 		  		panel2.height=hh	
-				panel.y=panel2.height+otstup
+				panel.y = panel2.height+otstup;
+
+
+
 				sizeWindow();
 				ggggg()
 		  	}, 10);
 		});
 	}
-
+	let bbb=true
 	function creatUrl(){
 		var sURL = window.document.URL.toString();
 		let aa=sURL.split("?");
@@ -428,6 +465,29 @@
 
 		history.pushState(null, null, uu);
 		//window.location.href = uu;
+
+
+
+		if(bbb==false)return
+		if(!aa[1]){
+			return
+		}
+		let rr=getURLParameters("n");
+		if(!rr){
+			return
+		}
+		
+
+		const fullUrl = window.location.href;	
+		if(fullUrl.indexOf('http://demo/')==-1){
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'UA-30708630-1')//, { 'user_id': rr});	
+			gtag('event', "__"+rr);
+			bbb=false		
+		}	
+
 	}
 
 

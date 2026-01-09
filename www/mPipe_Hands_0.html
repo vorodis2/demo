@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MediaPipe Hands  + Three.js. Trying out a new library. Turning rings and watches on/off. Linking them to your hand.</title>
+    <style>
+    /*body {
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+    }
+
+    video {
+        display: none;
+    }*/
+    </style>
+</head>
+
+<body>
+    <video id="video" autoplay playsinline></video>
+    <script src='src/lib/divLib.js'></script>
+    <!-- Three.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+    <!-- MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script type="module">
+    var trace = window.console.log.bind(window.console);
+    var main, dcmParam;   
+    dcmParam=new DCM()
+
+    function init(){
+        main = new Main()
+
+        window.addEventListener('resize', resize)       
+    }
+
+    function resize(){
+        main.resize(document.documentElement.clientWidth, document.documentElement.clientHeight)
+    }
+
+    
+    /* ---------------- VIDEO ---------------- */
+    const video = document.getElementById('video');
+
+
+    trace("ggggggggggggg",dcmParam);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* ---------------- LOOP ---------------- */
+    
+
+    /* ---------------- RESIZE ---------------- */
+  /*  window.addEventListener('resize', () => {
+        resize()
+
+        camera3D.aspect = window.innerWidth / window.innerHeight;
+        camera3D.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });*/
+
+
+    export class Main {
+        constructor() {
+            this.type = "Main";
+            var self=this
+            var renderer,scene,camera,spheres
+          
+            var dCont=new DCont(document.body)
+            var dCont1=new DCont(dCont)
+            var dCont0=new DCont(dCont)
+           
+           // var p0=new DPanel(dCont)
+            //var p1=new DPanel(dCont)
+            var label=new DLabel(dCont,2,2,"v:2")
+            label.fontSize=12;
+            label.width=222;
+            var ww = 640
+            var hh = 480
+            var w = 640
+            var h = 480
+         
+
+
+            function init(){  
+
+                const video = document.getElementById('video');
+                
+                video.addEventListener('loadedmetadata', () => {
+                    ww=video.videoWidth;
+                    hh=video.videoHeight;
+                    self.resize()
+                    
+                    //console.log('video size:', video.videoWidth, video.videoHeight);
+
+                      /*info.innerHTML = `
+                        videoWidth  = ${video.videoWidth}<br>
+                        videoHeight = ${video.videoHeight}
+                      `;
+
+                     
+                      const scale = 0.5;
+                      video.style.transform = `scale(${scale})`;*/
+                });
+
+                dCont1.div.appendChild(video)
+
+
+
+
+
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(
+                    45, window.innerWidth / window.innerHeight, 0.01, 100
+                );
+                camera.position.z = 2;
+                renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.shadowMap.enabled = true;
+                renderer.setClearColor(0xffffff, 0);
+                dCont0.div.appendChild(renderer.domElement); 
+
+
+                scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+                spheres = [];
+                const sphereGeo = new THREE.SphereGeometry(0.02, 16, 16);
+                const sphereMat = new THREE.MeshStandardMaterial({ color: 0x44ff44 });
+
+                for (let i = 0; i < 21; i++) {
+                    const s = new THREE.Mesh(sphereGeo, sphereMat);
+                    scene.add(s);
+                    spheres.push(s);
+                }
+
+
+
+                /* ---------------- CAMERA ---------------- */
+                const cam = new Camera(video, {
+                    onFrame: async () => {
+                        await hands.send({ image: video });
+                    },
+                   //width: 640,
+                   // height: 480
+                });
+                cam.start();
+
+
+                /* ---------------- MEDIAPIPE ---------------- */
+                const hands = new Hands({
+                    locateFile: (file) =>
+                        `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                });
+
+                hands.setOptions({
+                    maxNumHands: 1,
+                    modelComplexity: 1,
+                    minDetectionConfidence: 0.7,
+                    minTrackingConfidence: 0.7
+                });
+
+                hands.onResults(results => {
+                    if (!results.multiHandLandmarks) return;
+
+                    //console.warn(results.multiHandLandmarks)
+                    if (results.multiHandLandmarks[0]) {
+
+                       const landmarks = results.multiHandLandmarks[0];
+                        
+                         for (let i = 0; i < landmarks.length; i++) {
+                            const lm = landmarks[i];
+
+                            // MediaPipe → Three.js coords 
+                            const x = -(lm.x - 0.5) * 2;
+                            const y = -(lm.y - 0.5) * 2;
+                            const z = -lm.z;
+                            spheres[i].position.set(x, y, z);
+                        }
+                    }                    
+                });
+            }
+
+            function dragInfo() {
+                let s='<br>scale: '+scale+''
+
+                //s+='<br>scale: '+scale
+                //s+='<br>scale: '+scale
+                s+='</br>'
+                label.dCT.div.innerHTML  = s//'<br>website: <a href="https://vorodis2.info" target="_blank">vorodis2.info</a><br> emeil:   vorodis2@gmail.com <br>phone: +380951026557</br></br>';
+            }
+            
+
+
+            function animate() {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            }
+
+
+            this.resize = function (_w, _h){
+                if(_w){
+                    w=_w;
+                    h=_h; 
+                }   
+                w=document.documentElement.clientWidth
+                h=document.documentElement.clientHeight
+
+
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.setSize(w,h);
+
+
+                this.dragPosit()
+            }
+
+            let scale
+            
+            this.dragPosit = function (){
+                scale=h/hh;
+                if(scale>w/ww){
+                    scale=w/ww
+                }
+
+
+                trace(scale)
+                //dCont1.scale=scale;
+
+                
+                //dCont1.x=111
+
+
+                let hhh=(h-hh)
+                let www=(w-ww)
+                dCont1.y=hhh/2                    
+                dCont1.x=www/2; 
+                /*if(scale<1){
+                    
+                   // p0.height=hhh;
+                    
+                   // p1.y=p0.height;                   
+                    dCont1.y=hhh/2                    
+                    dCont1.x=www/2; 
+
+                }else{
+                   
+                    //p0.height=hhh;                    
+                    //p1.y=p0.height;                      
+                    dCont1.y=hhh/2
+                    dCont1.x=www/2; 
+                }*/
+
+                video.style.transform = 'scaleX(-'+scale+') scaleY('+scale+')';
+                //dCont1.y=(h-hh)*scale/2
+
+                //label.text="="+scale
+
+                dragInfo()
+            }
+
+
+
+            init()
+            animate(); 
+        }
+    }
+
+    init()
+
+
+    </script>
+</body>
+
+</html>
