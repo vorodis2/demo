@@ -1,0 +1,478 @@
+<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>divLib component library. Not tied to HTML markup, using anything other than JS.</title>   
+<script src="src/lib/divLib.js?v=1"></script>
+
+
+<script src='src/lib/jquery-1.11.3.js'></script>
+
+
+
+<script src="src/lib/tween.min.js"></script>
+<script>
+    var trace = window.console.log.bind(window.console);
+    var array=[];
+    var pObject,content,dinamik, testContent
+    var ww=150
+    var dcmParam;
+    function downMy(s) {
+        //trace(s,this.index,this)
+
+        //setDin(this)          
+    }
+
+    function setDin(o) {
+        if(dinamik.uuid!=o.uuid){                   
+            dinamik=o;          
+            if(dinamik.type!=undefined)pObject.window.title=dinamik.type            
+            pObject.addObject(dinamik);
+        }
+        
+    }
+    function animate() {
+        requestAnimationFrame( animate );
+        TWEEN.update(); 
+    }
+    animate()
+
+    function init () {
+        window.onresize = sizeWindow;
+        dinamik = dcmParam=new DCM();
+
+        scane= new DCont(document.body);
+
+        //dcmParam.zbrosDokument=false;
+        //dcmParam.borderRadius=4
+
+        scane= new DCont(document.body);
+        content= new DCont(scane);
+        //content.scale=0.65
+        content.position.x=320;
+
+        
+
+        
+        dcmParam.fontFamily = "Open Sans"//"PT Mono";           //тип шрифта, надо подключать
+        dcmParam.fontSizeErrorY=0.1
+        
+
+        this.bmpPic=new DBitmapData(2,2); 
+        var dragPic=new DDragPic(scane);
+    
+
+
+        //b.textAlign="center"//
+
+        
+        /*b.fun_mousedown=function(){
+            //dragPic.testDrag(20);
+            trace()
+            var o={sss:"dfgsdfgdsf"}
+            var l="resources/pic/3.png";            
+            dragPic.start(32, l, o);
+        };*/
+
+        //dcmParam.color1   ="#cccccc"
+
+
+        pObject=new DParamObject(scane,2,2,function(){          
+            sizeWindow()
+        });
+
+        var bb2=new DButton(null,0,0,"Button",downMy)
+        plus(bb2);
+        bb2.height=111
+        bb2.width=111
+        //bb2.textAlign='Left'
+        bb2.svgColor="#ff0012";
+        bb2.link="resources/pic/Vector (2).svg"
+
+
+        let wer=    new DInput(null,0,0,"DWindow",downMy)
+        plus(wer);
+        //wer.svgColor="#ff0012";
+        //wer.link="resources/pic/Vector (2).svg"
+        trace(wer)
+        wer.setEMail()
+        pObject.addObject(wer);
+        
+
+
+
+
+
+        var bb=new DButton(null,0,0,"Button",function(){
+            this.ap0=[ 
+                ['#ffffff','#ff0000'],  
+                ['#000000','#000000']
+            ]        
+            this.bm0=new DBitmapData(10,10, null);
+            dcmParam.getPolitBase64(this.bm0.canvas,this.ap0, 10, false)
+        })
+        //var bb=new DButton(null,0,0,"Button",downMy,"resources/pic/0.png")
+        
+
+        //var bb=new DButton(null,0,0," ",downMy,sss)
+        plus(bb);
+        bb.height=111
+        bb.width=111
+        //bb.textAlign='Left'
+        bb.svgColor="#ff0012";
+        //bb.link="resources/pic/Sets.svg"
+        bb.link="https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-prod/appinfo/0006/0000515856/de-language-icon.svg?0.5304529306401422"
+        //bb.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appsuperset/1228/0000509776/image.svg'
+        //bb.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appinfo/0149/0000509758/root.svg'
+        //bb.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appinfo/0155/0000509705/accessories.svg'
+        pObject.addObject(bb);
+
+
+
+        var bb=new DPanel(null,0,0);
+        plus(bb);
+        
+        var bb=new DColor(null,0,0);
+        plus(bb);
+        
+        var bb=new DColorList(null,0,0,null,downMy);
+        plus(bb);
+        bb.width=244
+        
+        pObject.addObject(bb);
+
+        /**/
+        
+        
+        var bb=new DCheckBox(null,0,0,"DCheckBox",downMy);
+        plus(bb);
+        
+    
+        
+
+
+        var bb=new DButton(null,0,0,"Button",downMy)
+        //var bb=new DButton(null,0,0,"Button",downMy,"resources/pic/0.png")
+        
+
+        //var bb=new DButton(null,0,0," ",downMy,sss)
+        plus(bb);
+        bb.height=111
+        bb.width=111
+        //bb.textAlign='Left'
+        bb.svgColor="#ff0012";
+        bb.link="resources/pic/Vector (2).svg"
+        //bb.link="https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appsuperset/1227/0000509768/materials.svg"
+        //bb.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appsuperset/1228/0000509776/image.svg'
+        //bb.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appinfo/0149/0000509758/root.svg'
+        bb.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appinfo/0155/0000509705/accessories.svg'
+        pObject.addObject(bb);
+        
+
+        var bb1=new DButton(null,0,0,"Button",downMy)
+        plus(bb1);
+        bb1.height=111
+        bb1.width=111
+        //bb1.textAlign='Left'
+        bb1.svgColor="#ff0012";
+        //bb1.link="resources/pic/Vector (2).svg"
+        //bb1.link="https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appsuperset/1227/0000509768/materials.svg"
+        bb1.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appsuperset/1228/0000509776/image.svg'
+        //bb1.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appinfo/0149/0000509758/root.svg'
+        
+        var bb2=new DButton(null,0,0,"Button",downMy)
+        plus(bb2);
+        bb2.height=111
+        bb2.width=111
+        //bb2.textAlign='Left'
+        bb2.svgColor="#ff0012";
+        bb2.link="resources/pic/Vector (2).svg"
+        //bb2.link="https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appsuperset/1227/0000509768/materials.svg"
+        //bb2.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appsuperset/1228/0000509776/image.svg'
+        //bb2.link='https://dev-brwzr3d-com.s3.eu-central-1.amazonaws.com/media-dev/appinfo/0149/0000509758/root.svg'
+
+    /*  bb.color=dcmParam.getColor("#ffff00")
+        trace("ccc=",bb.color)
+        bb1.color=dcmParam.getColor("#ffff00", 55,true)
+        trace("ccc=",bb1.color)
+
+        bb2.color=dcmParam.getColor("#ffff00", -55)
+        trace("ccc=",bb2.color)*/
+        //return
+
+
+
+
+
+
+
+
+
+
+
+        var ii=new DImage(null,0,0,null)
+        ii.svgColor="#ff0012";
+
+
+        plus(ii);
+        ii.link="resources/pic/0.png";
+        //ii.link="resources/pic/Vector (2).svg"
+        
+
+        var bbb=new DButtons(null,0,0,["xz","xz1","xz2"],downMy)
+        //bbb.boolDragIndex=false
+        bbb.setTArr(["xz","xz1"])
+        bbb.setTArr(["xz11","xz222","xz333","xs444","xz5552222","xz666"])
+        plus(bbb);
+        
+
+
+
+
+
+
+        plus(new DButton(null,0,0,"ButtonLoad",function(base64){
+            trace(base64,this);
+        }));
+        array[array.length-1].obj.startFile()
+        
+
+        plus(new DPanel(null,0,0));
+
+
+
+
+        /////////////////////////////
+        
+        //return
+        plus(new DLabel(null,0,0,"text My"));
+
+        plus(new DGlow(null,0,0));
+
+        //plus(new DHelp(null,0,0,"Buttonaasdasdasd ascasd","resources/pic/0.png"));
+
+        
+        
+        plus(new DSlider(null,0,0,downMy));
+        plus(new DSliderBig(null,0,0,downMy,"DSliderBig",50,150));
+        plus(new DInput(null,0,0,"DInput2",downMy));
+
+        //array[array.length-1].obj.setNum(0.1);
+        
+        //return
+        plus(new DTextArea(null,0,0,"DTextArea",downMy));
+        plus(new DCheckBox(null,0,0,"DCheckBox",downMy));
+        
+        
+
+
+
+        var bbb=new DButtons(null,0,0,["xz","xz1","xz2"],downMy)
+        //bbb.boolDragIndex=false
+        bbb.setTArr(["xz","xz1"])
+        bbb.setTArr(["xz11","xz222","xz333","xs444","xz5552222","xz666"])
+    
+        
+        plus(bbb);
+        
+
+
+        let wwwww=  new DWindow(null,0,0,"DWindow",downMy)
+        plus(wwwww);
+        
+        plus(new DColor(null,0,0,"#0000ff",downMy));
+
+        plus(new DScrollBarV(content,677,133,downMy))
+
+        
+
+        plus(new DScrollBarH(content,677,133,downMy))
+        
+
+        
+
+        var g= new DGallery(content,800,300,downMy);
+        var a=[]
+        for (var i = 0; i < 10; i++) {
+            a.push({src:"resources/pic/"+Math.round(Math.random()*3)+".png"})
+        }
+        g.start(a);
+        g.kolII=2
+        plus(g);
+        pObject.addObject(g);
+
+
+        var dragPic1=new DDragPic();
+
+        new DButton(content,200,222,"ttt",function(){
+            // var a=[]
+            // var k=10+Math.random()*33;
+            // for (var i = 0; i < k; i++) {
+            //  a.push({src:"resources/pic/"+Math.round(Math.random()*3)+".png"})
+            // }
+            // g.start(a);
+           /* var a=[]
+            var k=10+Math.random()*33;
+            for (var i = 0; i < k; i++) {
+                var d=""+Math.random()*222
+
+                a.push(d)
+            }
+            //g.start(a);
+            rrr.array=a*/
+
+
+            dragPic1.testDrag(1,self.clik,self.clik1,self.clik2)
+
+        })
+
+        this.clik = function (e) {
+            trace("clik------------------")     
+            //if (self.fun) self.fun();
+        };
+        this.clik1 = function (e) { 
+            trace("clik1")      
+            //if (self.fun) self.fun();
+        };
+        this.clik2 = function (e) {  
+            trace("clik2")     
+            //if (self.fun) self.fun();
+        };
+
+
+        var bd= new DButtonDrag(content, 0, 0, "resources/pic/0.png", "resources/pic/1.png",function(){
+            trace(this.value)
+        });
+
+
+
+
+
+        var rrr=new DComboBox(content,0,0,[],function(){
+            trace(this.index+"   "+this.value)
+        })
+        plus(rrr)
+        rrr.array = ["sdfsdfsdfsdczsdfsdzdfczxcxzcfsdfsdsaafsdgfsdfd", "xz","xz1","xz2", "xz3", "xz4", "xz5", "xz6", "xz7", "xz8", "xz9", "xz10",]
+        rrr.width = 200;
+        rrr.height = 40;
+        rrr.x = 100;
+        rrr.y = 150;
+       
+        /*var three=new DThreeBool(content,900,0,function(){
+        
+        })*/
+        // three.mouseUpFun=function(o){
+        //
+        //
+        //     trace("mouseUpFun",o)
+        // }
+        // three.mouseOverFun=function(o){
+        //     trace("mouseOverFun",o)
+        // }
+        //
+        // three.mouseOutFun=function(o){
+        //  trace("mouseOutFun",o)
+        // }
+        //
+        //
+        // plus(three)
+        /*
+
+        trace("g",g);
+
+
+        var obj1={uuid:Math.random(),name:"name1",link:"resources/pic/1.png",array:[{uuid:Math.random(),link:"resources/pic/1.png",array:[]},{uuid:Math.random(),link:"resources/pic/1.png",array:[{uuid:Math.random(),link:"resources/pic/1.png",array:[]}]}]}
+
+        three.setObj(obj1,"array","name")*/
+        //three.setObj(obj1,"array")
+        //three.setObj(g,"children","type")
+
+        
+        var nnnnn=new DButton(scane,500,336,"DInput",downMy)
+        nnnnn.startFile()
+
+        /**/
+        
+    }
+        
+    function plus (obj) {       
+        var p=new DPanel(content,0,0);
+        var p1=new DPanel(p,ww,2);
+        p.width=ww*2+10;
+        p1.width=ww+6;
+        p.height=obj.height+12;
+        p1.height=obj.height+6;
+        obj.x=2;
+        obj.y=2;
+        p1.add(obj);
+        p.object=obj
+        p.panel=p1
+        obj.width=ww;
+
+        p.obj=obj;
+
+        var l1=new DLabel(p,24,2,obj.type);
+        var l=new DLabel(p,2,p1.height-8,"height:"+obj.height);
+        p.label=l
+        l.alpha=0.75;
+        l.fontSize=10;
+        array.push(p)
+
+
+        var b=new DButton(p,2,2,">",function(){
+            setDin(this.obj)
+        });
+        b.obj=obj;
+        b.width=16;
+        b.height=16;
+        b.color="#dddddd";
+
+        sizeWindow();
+    }
+
+    function drahHH () {
+        for (var i = 0; i < array.length; i++) {
+
+            array[i].height=array[i].obj.height+12;
+            array[i].panel.height=array[i].obj.height+6;
+            array[i].label.y=array[i].obj.height-8
+            array[i].label.text="height:"+array[i].obj.height
+        }
+    }
+    
+
+    function sizeWindow () {
+        drahHH()            
+        var h = document.documentElement.clientHeight;
+        var y=36;
+        var x=0;
+        for (var i = 0; i < array.length; i++) {
+            array[i].y=y;
+            array[i].x=x;
+            y+=array[i].height+2;
+            if(y>h){
+                y=2;
+                x+=ww*2+12
+                array[i].y=y;
+                array[i].x=x;
+                y+=array[i].height+2;   
+            }
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        init();//строитель      
+    });
+
+
+</script></head>
+
+<style type="text/css">
+    #stats { position: absolute; top:0; left: 200px; }
+    @font-face {
+        font-family: "Open Sans";
+        src: url(resources/font/open-sans.ttf) format("truetype");
+    }
+    
+
+</style>
+
+<body ></body></html>

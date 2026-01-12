@@ -2,7 +2,7 @@
 <html>
 <head> 
 <title>MediaPipe Hands  + Three.js. Trying out a new library. Turning rings and watches on/off. Linking them to your hand.</title>
-<script src='src/lib/divLib.js'></script> 
+<script src='src/lib/divLib.js'></script> <!--vorodis2 library: https://github.com/vorodis2/divLib/-->
 <script src='src/lib/three.min_158.js'></script>    
 <script src='src/lib/tween.min.js'></script>    
 <meta charset="UTF-8"><title>physicsCalc</title></head><meta name="viewport" content="width=device-width,height=device-height,user-scalable=no user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
@@ -21,7 +21,7 @@
     var trace = window.console.log.bind(window.console);
     var main, dcmParam;   
     dcmParam=new DCM()
-
+    dcmParam.wh=22
 
 
 
@@ -54,6 +54,7 @@
             var self=this
             var renderer, scene, camera, spheres, handsBlok, perst
             var sphere
+
           
             var dCont=new DCont(document.body)
             var dCont1=new DCont(dCont)
@@ -62,12 +63,14 @@
 
             self.dContC=new DCont(dCont)
 
-           
-           // var p0=new DPanel(self.dContC)
-            //var p1=new DPanel(dCont)
-            var label=new DLabel(dCont,2,2,"v:2")
-            label.fontSize=12;
-            label.width=222;
+
+
+
+
+            
+
+
+
             var ww = 640
             var hh = 480
             var w = 640
@@ -82,7 +85,7 @@
             let mark
 
             function init(){  
-
+                initMenu()
                 const video = document.getElementById('video');                
                 video.addEventListener('loadedmetadata', () => {
                     ww=video.videoWidth;
@@ -245,7 +248,7 @@
 
 
             function dragInfo() {
-                let s='<br>scale: '+scale+''
+                let s='scale: '+scale+''
                 s+='<br>WxH: '+ww+'x'+hh
                 s+='</br>'
                 label.dCT.div.innerHTML  = s;
@@ -254,13 +257,9 @@
 
 
             function animate() {
-
                 requestAnimationFrame(animate);
                 if(!renderer){
                     return
-
-
-
 
                 }
                 
@@ -321,6 +320,19 @@
                 this.scale=scale
                 dragInfo();
             }
+
+            var label
+            function initMenu(){  
+                label=new DLabel(dCont,2,2,"v:2")
+                label.fontSize=12;
+                label.width=222;
+
+                new DCheckBox(dCont, 2,28,"video",function(){ dCont1.visible=this.value }).value=true
+                new DCheckBox(dCont, 2,28+dcmParam.wh,"canvas",function(){ self.dContC.visible=this.value }).value=true
+                new DCheckBox(dCont, 2,28+dcmParam.wh*2,"points",function(){ handsBlok.content3d.visible=this.value }).value=true
+                new DCheckBox(dCont, 2,28+dcmParam.wh*3,"fingertip",function(){ perst.content3d.visible=this.value }).value=true
+            }
+
 
 
 
