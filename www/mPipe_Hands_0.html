@@ -1,34 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+<head> 
+<title>MediaPipe Hands  + Three.js. Trying out a new library. Turning rings and watches on/off. Linking them to your hand.</title>
+<script src='src/lib/divLib.js'></script> 
+<script src='src/lib/three.min_158.js'></script>    
+<script src='src/lib/tween.min.js'></script>    
+<meta charset="UTF-8"><title>physicsCalc</title></head><meta name="viewport" content="width=device-width,height=device-height,user-scalable=no user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-<head>
-    <meta charset="UTF-8">
-    <title>MediaPipe Hands  + Three.js. Trying out a new library. Turning rings and watches on/off. Linking them to your hand.</title>
-    <style>
-    /*body {
-        margin: 0;
-        overflow: hidden;
-        background: #000;
-    }
-
-    video {
-        display: none;
-    }*/
-    </style>
-</head>
-
-<body>
-    <video id="video" autoplay playsinline></video>
+<script type="importmap">{"imports": {"three": "./src/lib/tv156/three.module.js","three/addons/": "./src/lib/tv156/jsm/"}}</script>
+<video id="video" autoplay playsinline></video>
     <script src='src/lib/divLib.js'></script>
-    <!-- Three.js -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-    <!-- MediaPipe -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-<script type="module">
+    <script type="module">
+    import * as THREE from 'three';
+    window.THREE=THREE
+    window.trace = window.console.log.bind(window.console);
+
+    import { GLTFLoader } from './src/lib/three/GLTFLoader.js';     //вьювер3д
     var trace = window.console.log.bind(window.console);
     var main, dcmParam;   
     dcmParam=new DCM()
+
+
+
 
     function init(){
         main = new Main()
@@ -45,45 +40,30 @@
     const video = document.getElementById('video');
 
 
-    trace("ggggggggggggg",dcmParam);
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-    /* ---------------- LOOP ---------------- */
-    
-
-    /* ---------------- RESIZE ---------------- */
-  /*  window.addEventListener('resize', () => {
-        resize()
-
-        camera3D.aspect = window.innerWidth / window.innerHeight;
-        camera3D.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });*/
+  
+        
 
 
     export class Main {
         constructor() {
             this.type = "Main";
             var self=this
-            var renderer,scene,camera,spheres
+            var renderer, scene, camera, spheres, handsBlok, perst
+            var sphere
           
             var dCont=new DCont(document.body)
             var dCont1=new DCont(dCont)
             var dCont0=new DCont(dCont)
+            var dCont0_0=new DCont(dCont0)
+
+            self.dContC=new DCont(dCont)
+
            
-           // var p0=new DPanel(dCont)
+           // var p0=new DPanel(self.dContC)
             //var p1=new DPanel(dCont)
             var label=new DLabel(dCont,2,2,"v:2")
             label.fontSize=12;
@@ -92,62 +72,50 @@
             var hh = 480
             var w = 640
             var h = 480
-         
+            self.ww=w;
+            self.hh=h;
+            this.scale1 =1;
+            this.content3d=new THREE.Object3D()
+            this.canvas=null;
+            self.ctx
 
+            let mark
 
             function init(){  
 
-                const video = document.getElementById('video');
-                
+                const video = document.getElementById('video');                
                 video.addEventListener('loadedmetadata', () => {
                     ww=video.videoWidth;
                     hh=video.videoHeight;
-                    self.resize()
+                    self.ww=ww;
+                    self.hh=hh;
+                  
+                    self.canvas = document.createElement('canvas');
+                    self.canvas.style.top = '0px';
+                    self.canvas.style.left = '0px';
+                    self.canvas.style.position = 'fixed';
+                    self.canvas.width =ww;
+                    self.canvas.height =hh;
+                    self.ctx = self.canvas.getContext('2d', { willReadFrequently: true });
                     
-                    //console.log('video size:', video.videoWidth, video.videoHeight);
 
-                      /*info.innerHTML = `
-                        videoWidth  = ${video.videoWidth}<br>
-                        videoHeight = ${video.videoHeight}
-                      `;
+                    self.dContC.div.appendChild(self.canvas);
+                    
 
-                     
-                      const scale = 0.5;
-                      video.style.transform = `scale(${scale})`;*/
+                    
+                    
+
+
+                    //dCont0_0.scale = 1/self.scale1
+
+                    init1()
+                    self.resize() 
                 });
-
                 dCont1.div.appendChild(video)
 
-
-
-
-
-                scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera(
-                    45, window.innerWidth / window.innerHeight, 0.01, 100
-                );
-                camera.position.z = 2;
-                renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                renderer.shadowMap.enabled = true;
-                renderer.setClearColor(0xffffff, 0);
-                dCont0.div.appendChild(renderer.domElement); 
-
-
-                scene.add(new THREE.AmbientLight(0xffffff, 1));
-
-                spheres = [];
-                const sphereGeo = new THREE.SphereGeometry(0.02, 16, 16);
-                const sphereMat = new THREE.MeshStandardMaterial({ color: 0x44ff44 });
-
-                for (let i = 0; i < 21; i++) {
-                    const s = new THREE.Mesh(sphereGeo, sphereMat);
-                    scene.add(s);
-                    spheres.push(s);
-                }
-
-
-
+               
+                
+               
                 /* ---------------- CAMERA ---------------- */
                 const cam = new Camera(video, {
                     onFrame: async () => {
@@ -157,8 +125,6 @@
                    // height: 480
                 });
                 cam.start();
-
-
                 /* ---------------- MEDIAPIPE ---------------- */
                 const hands = new Hands({
                     locateFile: (file) =>
@@ -174,39 +140,140 @@
 
                 hands.onResults(results => {
                     if (!results.multiHandLandmarks) return;
-
-                    //console.warn(results.multiHandLandmarks)
-                    if (results.multiHandLandmarks[0]) {
-
-                       const landmarks = results.multiHandLandmarks[0];
-                        
-                         for (let i = 0; i < landmarks.length; i++) {
-                            const lm = landmarks[i];
-
-                            // MediaPipe → Three.js coords 
-                            const x = -(lm.x - 0.5) * 2;
-                            const y = -(lm.y - 0.5) * 2;
-                            const z = -lm.z;
-                            spheres[i].position.set(x, y, z);
-                        }
-                    }                    
+                    handsBlok.set(results.multiHandLandmarks[0]);                   
                 });
             }
 
+
+            //----------------------------------------
+            function fixeXX(){ 
+                if(!mark){
+                    mark=new THREE.Object3D()
+                    mark.position.x=1
+                    mark.rotation.y=Math.PI/2
+                    self.content3d.add(mark)
+
+
+                  /*  let ax=new THREE.AxesHelper(0.2)
+                    ax.position.x=0.2
+                    mark.add( ax);
+                    mark.add( new THREE.AxesHelper(0.5));*/
+
+                }
+                
+
+                var vector11 = new THREE.Vector3();
+
+                renderer.render(scene, camera);
+
+                mark.getWorldPosition(vector11);                
+                toScreenXY(vector11)
+                let wer=ww-vectorScreen.x;
+                let ss=1-wer/ww                
+                camera.position.z*=ss
+                
+                return  wer 
+            }
+            
+
+
+            var vectorScreen = new THREE.Vector2();
+            var vector3 = new THREE.Vector3();
+            function toScreenXY(v3) { // 3d world vector to screen
+                vector3.copy(v3);
+               // trace(vector3, camera)
+                vector3.project(camera);
+               // trace(vector3)
+                vectorScreen.x = Math.round((vector3.x + 1) * ww / 2*1000)/1000;
+                vectorScreen.y = Math.round((-vector3.y + 1) * hh / 2*1000)/1000;
+/**/
+                return vectorScreen;
+            };
+            //----------------------------------------
+
+
+                
+            function init1(){    
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(
+                    45, window.innerWidth / window.innerHeight, 0.01, 100
+                );
+
+
+
+                camera.position.z = 2
+                renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+                renderer.setSize(ww, hh);
+                renderer.shadowMap.enabled = true;
+                renderer.setClearColor(0x000000, 0);
+
+                renderer.domElement.style.top = '0px';
+                renderer.domElement.style.left = '0px';
+                renderer.domElement.style.position = 'fixed';
+                dCont0.div.appendChild(renderer.domElement); 
+               // dCont0.alpha=0.5
+
+                scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+                
+                scene.add(self.content3d) 
+
+
+                self.resize()
+                for (var i = 0; i < 100; i++) {
+
+                    if(Math.abs(fixeXX())<0.2){
+                        break
+                    }
+                }
+               
+                let ss='[{"x":0.06612011790275574,"y":0.47335028648376465,"z":3.6903813338540203e-7},{"x":0.12352403998374939,"y":0.45421284437179565,"z":-0.019638791680336},{"x":0.16789044439792633,"y":0.407586932182312,"z":-0.02680037170648575},{"x":0.19851946830749512,"y":0.36483627557754517,"z":-0.03326117619872093},{"x":0.23119358718395233,"y":0.3484067916870117,"z":-0.040063824504613876},{"x":0.13318800926208496,"y":0.3131263852119446,"z":-0.013460008427500725},{"x":0.15817993879318237,"y":0.2548375129699707,"z":-0.026048321276903152},{"x":0.17227160930633545,"y":0.2152351438999176,"z":-0.0375341959297657},{"x":0.18216727674007416,"y":0.17946094274520874,"z":-0.04679809883236885},{"x":0.10142093151807785,"y":0.29554495215415955,"z":-0.015092302113771439},{"x":0.11263418942689896,"y":0.2199345976114273,"z":-0.02669781818985939},{"x":0.11875833570957184,"y":0.1711237132549286,"z":-0.03808113932609558},{"x":0.12165745347738266,"y":0.12748146057128906,"z":-0.04662717878818512},{"x":0.06985492259263992,"y":0.29619309306144714,"z":-0.019502056762576103},{"x":0.06889787316322327,"y":0.22291606664657593,"z":-0.03391067311167717},{"x":0.06732777506113052,"y":0.17399932444095612,"z":-0.046490442007780075},{"x":0.06561250984668732,"y":0.13017334043979645,"z":-0.0548313707113266},{"x":0.037977129220962524,"y":0.3126128017902374,"z":-0.025740662589669228},{"x":0.019261837005615234,"y":0.2571648061275482,"z":-0.041226085275411606},{"x":0.006931029260158539,"y":0.2199505865573883,"z":-0.049772121012210846},{"x":-0.0032143592834472656,"y":0.18369124829769135,"z":-0.0548313707113266}]'
+                handsBlok=new StruktBlok(self);
+                handsBlok.color='#44ff55'
+                handsBlok.init(JSON.parse(ss),[
+                    [0,1,2,3,4],
+                    [0,5,6,7,8],
+                    [0,9,10,11,12],
+                    [0,13,14,15,16],
+                    [0,17,18,19,20]
+                ]) //[{i:0,c:[{i:1,c:[{i:2}]}]}])
+
+                perst=new Perst(self);
+
+            }
+
+
+
             function dragInfo() {
                 let s='<br>scale: '+scale+''
-
-                //s+='<br>scale: '+scale
-                //s+='<br>scale: '+scale
+                s+='<br>WxH: '+ww+'x'+hh
                 s+='</br>'
-                label.dCT.div.innerHTML  = s//'<br>website: <a href="https://vorodis2.info" target="_blank">vorodis2.info</a><br> emeil:   vorodis2@gmail.com <br>phone: +380951026557</br></br>';
+                label.dCT.div.innerHTML  = s;
             }
             
 
 
             function animate() {
+
                 requestAnimationFrame(animate);
+                if(!renderer){
+                    return
+
+
+
+
+                }
+                
+                if(handsBlok){
+                    let rr=44
+                    self.ctx.clearRect(0,0,ww,hh);                   
+                    handsBlok.upDate()
+                    perst.setPointsS(handsBlok.spheres[8],handsBlok.spheres[7],handsBlok.spheres[6])
+                }
+                
                 renderer.render(scene, camera);
+
+
             }
 
 
@@ -215,60 +282,44 @@
                     w=_w;
                     h=_h; 
                 }   
-                w=document.documentElement.clientWidth
-                h=document.documentElement.clientHeight
-
-
-                camera.aspect = w / h;
-                camera.updateProjectionMatrix();
-                renderer.setSize(w,h);
-
-
-                this.dragPosit()
+                w=document.documentElement.clientWidth;
+                h=document.documentElement.clientHeight;
+                this.dragPosit();
             }
 
             let scale
-            
+            this.scale=1
+            this.scale1=1
+            this.boolWH=true
             this.dragPosit = function (){
                 scale=h/hh;
+                this.boolWH=true
                 if(scale>w/ww){
                     scale=w/ww
+                    this.boolWH=false
                 }
-
-
-                trace(scale)
-                //dCont1.scale=scale;
-
-                
-                //dCont1.x=111
-
-
                 let hhh=(h-hh)
                 let www=(w-ww)
                 dCont1.y=hhh/2                    
                 dCont1.x=www/2; 
-                /*if(scale<1){
-                    
-                   // p0.height=hhh;
-                    
-                   // p1.y=p0.height;                   
-                    dCont1.y=hhh/2                    
-                    dCont1.x=www/2; 
-
-                }else{
-                   
-                    //p0.height=hhh;                    
-                    //p1.y=p0.height;                      
-                    dCont1.y=hhh/2
-                    dCont1.x=www/2; 
-                }*/
-
                 video.style.transform = 'scaleX(-'+scale+') scaleY('+scale+')';
-                //dCont1.y=(h-hh)*scale/2
 
-                //label.text="="+scale
+                self.dContC.scale=scale
+                
+                self.dContC.x=(w/scale-ww)/2
+                self.dContC.y=(h/scale-hh)/2
 
-                dragInfo()
+                camera.aspect = ww / hh;
+                camera.updateProjectionMatrix();
+                renderer.setSize(ww*scale, hh*scale);
+                this.scale1 = camera.aspect;
+                //
+                dCont0.x=(w-ww*scale)/2
+                dCont0.y=(h-hh*scale)/2
+
+                
+                this.scale=scale
+                dragInfo();
             }
 
 
@@ -276,11 +327,305 @@
             init()
             animate(); 
         }
+
+
+
+
     }
 
+
+    export class Perst {
+        constructor(par) {
+            this.type = "Perst";
+            var self=this
+            this.par=par;
+             
+            const loader = new GLTFLoader();
+            this.content3d=new THREE.Object3D(); 
+            this.c3d=new THREE.Object3D();
+            this.c3d.position.y=0.02;
+            this.content3d.add(this.c3d);
+
+            //this.c3d.add(new THREE.AxesHelper(0.5))
+
+            this.par.content3d.add(this.content3d); 
+
+            loader.load(
+              './resources/model/perst.gltf',               // путь к файлу
+              (gltf) => {
+                const model = gltf.scene;
+                self.c3d.add(model);                
+              }
+            );
+
+
+            let scale=1
+            this.setPointsS=function(p0,p1,p2){ 
+                placeNail( this.content3d, p0.position, p1.position,p2.position)
+
+                scale=1
+                if(p0.position.z>0.08){
+                    scale+=(p0.position.z-0.08)*4
+                }else{
+                    scale-=(0.08-p0.position.z)*6
+                }
+                this.c3d.scale.set(scale,scale,scale)
+                let q=quatFromTwoPoints(p0.position,p1.position )
+                this.content3d.position.copy(p0.position)
+                this.content3d.quaternion.copy(q);
+            }
+
+
+
+
+
+
+            function quatFromTwoPoints(p0, p1, baseDir = new THREE.Vector3(0, -1, 0)) {
+              const dir = new THREE.Vector3()
+                .subVectors(p1, p0)
+                .normalize();
+
+              return new THREE.Quaternion().setFromUnitVectors(baseDir, dir);
+            }
+
+
+            function placeNail(nail, A, B, C) {
+              const v1 = new THREE.Vector3().subVectors(A, B);
+              const v2 = new THREE.Vector3().subVectors(C, B);
+
+              const fingerDir = v2.clone().normalize();
+              const axis = new THREE.Vector3().crossVectors(v1, v2).normalize();
+              const angle = v1.angleTo(v2);
+
+              const qDir = new THREE.Quaternion().setFromUnitVectors(
+                new THREE.Vector3(0, 0, 1),
+                fingerDir
+              );
+
+              const qBend = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+
+              nail.quaternion.copy(qDir).multiply(qBend);
+              nail.position.copy(C);
+            }
+
+
+
+        }
+    }
+
+    //perst.gltf
+
+
+    export class StruktBlok {
+        constructor(par) {
+            this.type = "StruktBlok";
+            var self=this
+            this.par=par;
+            this.spheres=null
+            this.content3d=new THREE.Object3D();
+            this.color="#ff0000"
+            this.par.content3d.add(this.content3d);    
+
+
+            this.cont1=new THREE.Object3D()
+          //  this.cont1.add(new THREE.AxesHelper(0.5))
+            
+            this.cont1.position.x=-1
+            this.cont1.position.y=-0.5
+            this.cont1.rotation.y=Math.PI/2
+            this.content3d.add(this.cont1)
+
+            this.aobj=null;
+            this.init = function(arr, aobj){
+                if(aobj)this.aobj=aobj;
+                if(this.spheres!=null)return;  
+                this.spheres=[]
+
+                const sphereGeo = new THREE.SphereGeometry(0.02, 16, 16);
+                const sphereMat = new THREE.MeshStandardMaterial({ color: this.color });
+
+                for (let i = 0; i < arr.length; i++) {
+                    const s = new THREE.Mesh(sphereGeo, sphereMat);
+
+                    //s.add(new THREE.AxesHelper(0.1))
+
+                    this.content3d.add(s);
+                    this.spheres.push(s);
+
+                    const lm=arr[i];
+                    const x = -(lm.x - 0.5) * 2;
+                    const y = -(lm.y - 0.5) * 2;
+                    const z = -lm.z;
+
+
+                    s.positionStart=new THREE.Vector3(x,y,z);
+                    s.positionNax=new THREE.Vector3(x,y,z);
+                    s.positionNorm=new THREE.Vector3(x,y,z);
+                }
+
+            }
+            var prosent=0.2
+            var posit=new THREE.Vector3()
+            var posit1=new THREE.Vector3()
+
+
+            var scaleX,scaleY
+
+
+            this.upDate=function(){
+                if(!this.spheres)return
+
+                for (let i = 0; i < this.spheres.length; i++) {
+                    posit.x=this.spheres[i].position.x-this.spheres[i].positionNax.x
+                    posit.y=this.spheres[i].position.y-this.spheres[i].positionNax.y
+                    posit.z=this.spheres[i].position.z-this.spheres[i].positionNax.z
+                    
+
+                    posit1.set(
+                        this.spheres[i].positionNax.x+posit.x*prosent,
+                        this.spheres[i].positionNax.y+posit.y*prosent,
+                        this.spheres[i].positionNax.z+posit.z*prosent
+                    )
+
+                    this.spheres[i].positionNorm.copy(posit1)
+
+
+
+
+                    scaleY=scaleX=1.00;
+
+                    scaleY/=this.par.scale1
+                   
+/*
+                    if(self.par.boolWH==false){
+
+                        scaleX=0.8;
+                        scaleY=0.6;
+
+
+                        scaleX*=self.par.scale1;
+                        scaleY*=self.par.scale1;
+                    }
+*/
+                    posit1.x*=scaleX;
+                    posit1.y*=scaleY;
+
+                    //posit1.z = 0//-0.68
+
+                   // if(i==8)
+                        this.corectPerspect(posit1)
+                    this.spheres[i].position.copy(posit1)
+
+
+                }
+
+
+                if(self.par.canvas){                    
+                    this.drawO(this.aobj)
+                }
+
+
+            }
+
+            let pp,pp1
+            let sc=0.8
+            this.corectPerspect = function(p){ 
+                pp=1-p.z/1.8 
+                p.x=p.x*pp
+
+                pp=1-p.z/2 
+                p.y=p.y*pp
+
+                //trace("p=",p)
+            }
+
+
+            var v3_0=new THREE.Vector3()
+            var v3_1=new THREE.Vector3() 
+
+            var vw,vh   
+            self.ctx=self.par.ctx
+            let col1
+            this.drawO = function(a){                
+                for (var i = 0; i < a.length; i++) {
+                    col1=dcmParam.getColor(this.color,-i*25)
+                    for (var j = 0; j < a[i].length-1; j++) {
+                        
+                        this.drawOP01(a[i][j],a[i][j+1])
+                    }
+                }
+
+                
+            }     
+            this.drawOP01 = function(p0, p1){    
+                
+                v3_0.set(
+                    this.spheres[p0].positionNorm.x/2+0.5, 
+                    -this.spheres[p0].positionNorm.y/2+0.5,
+                    this.spheres[p0].positionNorm.z
+                )
+
+                v3_1.set(
+                    this.spheres[p1].positionNorm.x/2+0.5,
+                    -this.spheres[p1].positionNorm.y/2+0.5, 
+                    this.spheres[p1].positionNorm.z
+                )
+
+                vw=this.par.ww;
+                vh=this.par.hh;
+
+                
+                self.ctx.strokeStyle = col1;
+                self.ctx.lineWidth = 2;
+                self.ctx.beginPath();
+                self.ctx.moveTo(v3_0.x * vw, v3_0.y * vh);
+                self.ctx.lineTo(v3_1.x * vw, v3_1.y * vh);
+
+                self.ctx.arc(v3_1.x * vw, v3_1.y * vh,  2, 0, Math.PI * 2);
+
+                self.ctx.stroke();
+
+                
+                    
+
+            }
+
+
+
+            let ss=222
+
+            this.set = function(arr){
+                if(arr){
+                    this.init(arr)
+                }
+                if(!this.spheres)return
+
+                if(!arr){
+                    for (let i = 0; i < this.spheres.length; i++) {
+                        this.spheres[i].positionNax.set(
+                            this.spheres[i].positionStart.x,
+                            this.spheres[i].positionStart.y,
+                            this.spheres[i].positionStart.z
+                        )
+                    }
+
+                    
+                }else{
+                    for (let i = 0; i < arr.length; i++) {
+                        const lm=arr[i];
+                        const x = -(lm.x - 0.5) * 2;
+                        const y = -(lm.y - 0.5) * 2;
+                        const z = -lm.z;
+
+
+                        this.spheres[i].positionNax.set(x,y,z);
+                          
+                    }                    
+                }                
+            }
+        }
+    } 
     init()
-
-
     </script>
 </body>
 
