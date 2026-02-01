@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<title>MediaPipe Hands + Three.js + OimoPhysics.js We recognize a hand, apply physics to it, and interact with cubes and fabric.</title>
+<script src='src/lib/divLib.js'></script> <!--vorodis2 library: https://github.com/vorodis2/divLib/-->
+<script src='src/lib/three.min_158.js'></script>    
+<script src='src/lib/tween.min.js'></script>    
+<meta charset="UTF-8"><title>physicsCalc</title></head><meta name="viewport" content="width=device-width,height=device-height,user-scalable=no user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+<script type="importmap">{"imports": {"three": "./src/lib/tv156/three.module.js","three/addons/": "./src/lib/tv156/jsm/"}}</script>
+<video id="video" autoplay playsinline></video>
+    <script src='src/lib/divLib.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src='src/lib/oimo/OimoPhysics.js'></script>
+
+    <script type="module">
+    import * as THREE from 'three';
+    window.THREE=THREE
+    window.trace = window.console.log.bind(window.console);
+
+    import { GLTFLoader } from './src/lib/three/GLTFLoader.js';     //вьювер3д
+
+
+
+
+    
+    import { OWord } from './src/oimo/OWord.js';
+
+    import { Tkan } from './src/tkan/Tkan.js';
+
+    var main, dcmParam;   
+    dcmParam=new DCM()
+    dcmParam.wh=22
+
+
+
+    function init(){
+        main = new Main()
+
+        window.addEventListener('resize', resize)       
+    }
+
+    function resize(){
+        main.resize(document.documentElement.clientWidth, document.documentElement.clientHeight)
+    }
+
+    
+    /* ---------------- VIDEO ---------------- */
+    const video = document.getElementById('video');
+
+
+
+
+
+
+  
+        
+
+
+    export class Main {
+        constructor() {
+            this.type = "Main";
+            var self=this
+            var renderer, scene, camera, spheres, handsBlok, perst,phisJolt
+            var sphere
+
+          
+            var dCont=new DCont(document.body)
+            var dCont1=new DCont(dCont)
+            var dCont0=new DCont(dCont)
+            var dCont0_0=new DCont(dCont0)
+
+            self.dContC=new DCont(dCont)
+
+
+
+
+
+            
+
+
+
+            var ww = 640
+            var hh = 480
+            var w = 640
+            var h = 480
+            self.ww=w;
+            self.hh=h;
+            this.scale1 =1;
+            this.content3d=new THREE.Object3D()
+            this.canvas=null;
+            self.ctx
+
+            let mark
+
+            function init(){  
+                initMenu()
+                const video = document.getElementById('video');                
+                video.addEventListener('loadedmetadata', () => {
+                    ww=video.videoWidth;
+                    hh=video.videoHeight;
+                    self.ww=ww;
+                    self.hh=hh;
+                  
+                    self.canvas = document.createElement('canvas');
+                    self.canvas.style.top = '0px';
+                    self.canvas.style.left = '0px';
+                    self.canvas.style.position = 'fixed';
+                    self.canvas.width =ww;
+                    self.canvas.height =hh;
+                    self.ctx = self.canvas.getContext('2d', { willReadFrequently: true });
+                    
+
+                    self.dContC.div.appendChild(self.canvas);
+                    
+
+                    
+                    
+
+
+                    //dCont0_0.scale = 1/self.scale1
+
+                    init1()
+                    self.resize() 
+                });
+                dCont1.div.appendChild(video)
+
+               
+                
+               
+                /* ---------------- CAMERA ---------------- */
+                const cam = new Camera(video, {
+                    onFrame: async () => {
+                        await hands.send({ image: video });
+                    },
+                   //width: 640,
+                   // height: 480
+                });
+                cam.start();
+                /* ---------------- MEDIAPIPE ---------------- */
+                const hands = new Hands({
+                    locateFile: (file) =>
+                        `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                });
+
+                hands.setOptions({
+                    maxNumHands: 1,
+                    modelComplexity: 1,
+                    minDetectionConfidence: 0.7,
+                    minTrackingConfidence: 0.7
+                });
+
+                hands.onResults(results => {
+                    if (!results.multiHandLandmarks) return;
+                    handsBlok.set(results.multiHandLandmarks[0]);                   
+                });
+            }
+
+
+            //----------------------------------------
+            function fixeXX(){ 
+                if(!mark){
+                    mark=new THREE.Object3D()
+                    mark.position.x=100
+                    mark.rotation.y=Math.PI/2
+                    self.content3d.add(mark)
+
+
+                }
+                
+
+                var vector11 = new THREE.Vector3();
+
+                renderer.render(scene, camera);
+
+                mark.getWorldPosition(vector11);                
+                toScreenXY(vector11)
+                let wer=ww-vectorScreen.x;
+                let ss=1-wer/ww                
+                camera.position.z*=ss
+                
+                return  wer 
+            }
+            
+         
+
+            var vectorScreen = new THREE.Vector2();
+            var vector3 = new THREE.Vector3();
+            function toScreenXY(v3) { // 3d world vector to screen
+                vector3.copy(v3);
+               
+                vector3.project(camera);
+               
+                vectorScreen.x = Math.round((vector3.x + 1) * ww / 2*1000)/1000;
+                vectorScreen.y = Math.round((-vector3.y + 1) * hh / 2*1000)/1000;
+/**/
+                return vectorScreen;
+            };
+            //----------------------------------------
+
+
+                
+            function init1(){    
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(
+                    45, window.innerWidth / window.innerHeight, 0.01, 10000
+                );
+
+
+
+                camera.position.z = 200
+                renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+                renderer.setSize(ww, hh);
+                renderer.shadowMap.enabled = true;
+                renderer.setClearColor(0x000000, 0);
+
+                renderer.domElement.style.top = '0px';
+                renderer.domElement.style.left = '0px';
+                renderer.domElement.style.position = 'fixed';
+                dCont0.div.appendChild(renderer.domElement); 
+               // dCont0.alpha=0.5
+
+                scene.add(new THREE.AmbientLight(0xffffff, 3));
+
+                
+                scene.add(self.content3d) 
+
+
+                self.resize()
+                for (var i = 0; i < 100; i++) {
+
+                    if(Math.abs(fixeXX())<0.2){
+                        break
+                    }
+                }
+               
+                let ss='[{"x":0.06612011790275574,"y":0.47335028648376465,"z":3.6903813338540203e-7},{"x":0.12352403998374939,"y":0.45421284437179565,"z":-0.019638791680336},{"x":0.16789044439792633,"y":0.407586932182312,"z":-0.02680037170648575},{"x":0.19851946830749512,"y":0.36483627557754517,"z":-0.03326117619872093},{"x":0.23119358718395233,"y":0.3484067916870117,"z":-0.040063824504613876},{"x":0.13318800926208496,"y":0.3131263852119446,"z":-0.013460008427500725},{"x":0.15817993879318237,"y":0.2548375129699707,"z":-0.026048321276903152},{"x":0.17227160930633545,"y":0.2152351438999176,"z":-0.0375341959297657},{"x":0.18216727674007416,"y":0.17946094274520874,"z":-0.04679809883236885},{"x":0.10142093151807785,"y":0.29554495215415955,"z":-0.015092302113771439},{"x":0.11263418942689896,"y":0.2199345976114273,"z":-0.02669781818985939},{"x":0.11875833570957184,"y":0.1711237132549286,"z":-0.03808113932609558},{"x":0.12165745347738266,"y":0.12748146057128906,"z":-0.04662717878818512},{"x":0.06985492259263992,"y":0.29619309306144714,"z":-0.019502056762576103},{"x":0.06889787316322327,"y":0.22291606664657593,"z":-0.03391067311167717},{"x":0.06732777506113052,"y":0.17399932444095612,"z":-0.046490442007780075},{"x":0.06561250984668732,"y":0.13017334043979645,"z":-0.0548313707113266},{"x":0.037977129220962524,"y":0.3126128017902374,"z":-0.025740662589669228},{"x":0.019261837005615234,"y":0.2571648061275482,"z":-0.041226085275411606},{"x":0.006931029260158539,"y":0.2199505865573883,"z":-0.049772121012210846},{"x":-0.0032143592834472656,"y":0.18369124829769135,"z":-0.0548313707113266}]'
+                
+                self.phisJolt=phisJolt=new PhisJolt(self,function(s,p,p1){
+                    if(s=="complitePhysics"){
+                        handsBlok.init(JSON.parse(ss),[
+                            [0,1,2,3,4],
+                            [0,5,6,7,8],
+                            [0,9,10,11,12],
+                            [0,13,14,15,16],
+                            [0,17,18,19,20]
+                        ]) 
+
+                    }
+                });
+
+
+                handsBlok=new StruktBlok(self);
+                handsBlok.color='#44ff55'
+               
+               //perst=new Perst(self);
+
+            }
+
+
+
+            function dragInfo() {
+                let s='scale: '+scale+''
+                s+='<br>WxH: '+ww+'x'+hh
+                s+='</br>'
+                label.dCT.div.innerHTML  = s;
+            }
+            
+
+
+            function animate() {
+                requestAnimationFrame(animate);
+                if(!renderer){
+                    return
+
+                }
+                
+                if(handsBlok){
+                    let rr=44
+                    self.ctx.clearRect(0,0,ww,hh);                   
+                    handsBlok.upDate()
+                   // perst.setPointsS(handsBlok.spheres[8],handsBlok.spheres[7],handsBlok.spheres[6])
+                }
+                
+                renderer.render(scene, camera);
+
+
+            }
+
+
+            this.resize = function (_w, _h){
+                if(_w){
+                    w=_w;
+                    h=_h; 
+                }   
+                w=document.documentElement.clientWidth;
+                h=document.documentElement.clientHeight;
+                this.dragPosit();
+            }
+
+            let scale
+            this.scale=1
+            this.scale1=1
+            this.boolWH=true
+            this.dragPosit = function (){
+                scale=h/hh;
+                this.boolWH=true
+                if(scale>w/ww){
+                    scale=w/ww
+                    this.boolWH=false
+                }
+                let hhh=(h-hh)
+                let www=(w-ww)
+                dCont1.y=hhh/2                    
+                dCont1.x=www/2; 
+                video.style.transform = 'scaleX(-'+scale+') scaleY('+scale+')';
+
+                self.dContC.scale=scale
+                
+                self.dContC.x=(w/scale-ww)/2
+                self.dContC.y=(h/scale-hh)/2
+
+                camera.aspect = ww / hh;
+                camera.updateProjectionMatrix();
+                renderer.setSize(ww*scale, hh*scale);
+                this.scale1 = camera.aspect;
+                //
+                dCont0.x=(w-ww*scale)/2
+                dCont0.y=(h-hh*scale)/2
+
+                
+                this.scale=scale
+                dragInfo();
+            }
+
+            var label
+            function initMenu(){  
+                label=new DLabel(dCont,2,2,"v:2")
+                label.fontSize=12;
+                label.width=222;
+
+                new DCheckBox(dCont, 2,28,"video",function(){ dCont1.visible=this.value }).value=true
+                new DCheckBox(dCont, 2,28+dcmParam.wh,"canvas",function(){ self.dContC.visible=this.value }).value=true
+                new DCheckBox(dCont, 2,28+dcmParam.wh*2,"points",function(){ handsBlok.content3d.visible=this.value }).value=true
+               // new DCheckBox(dCont, 2,28+dcmParam.wh*3,"fingertip",function(){ perst.content3d.visible=this.value }).value=true
+            }
+
+
+
+
+            init()
+            animate(); 
+        }
+
+
+
+
+    }
+
+
+
+    export class StruktBlok {
+        constructor(par) {
+            this.type = "StruktBlok";
+            var self=this
+            this.par=par;
+            this.spheres=null
+            this.content3d=new THREE.Object3D();
+            this.color="#ff0000"
+            this.par.content3d.add(this.content3d);    
+
+
+            this.cont1=new THREE.Object3D()
+
+            this.content3d.add(this.cont1)
+            this.scale=100
+            this.aobj=null;
+
+            this.arrArr=[]
+
+
+
+            this.init = function(arr, aobj){
+                if(aobj)this.aobj=aobj;
+                if(this.spheres!=null)return;  
+                this.spheres=[]
+                
+                //const sphereGeo = new THREE.SphereGeometry(0.02, 16, 16);
+                const sphereGeo = new THREE.SphereGeometry(2, 16, 16);
+                const sphereMat = new THREE.MeshStandardMaterial({ color: this.color });
+
+                for (let i = 0; i < arr.length; i++) {
+                    const s = new THREE.Mesh(sphereGeo, sphereMat);
+
+
+                    this.content3d.add(s);
+                    this.spheres.push(s);
+
+                    const lm=arr[i];
+                    const x = -(lm.x - 0.5) * 2
+                    const y = -(lm.y - 0.5) * 2
+                    const z = -lm.z
+
+
+                    s.positionStart=new THREE.Vector3(x,y,z);
+                    s.positionNax=new THREE.Vector3(x,y,z);
+                    s.positionNorm=new THREE.Vector3(x,y,z);
+                }
+                this.upDate()
+
+                let ww=4.5
+
+                for (let j = 0; j < aobj.length; j++) {
+                    this.arrArr[j]=[]
+                    for (let i = 1; i < aobj[j].length; i++) {
+                        let o={}
+                        o.p0=this.spheres[aobj[j][i-1]]
+                        o.p1=this.spheres[aobj[j][i]]
+
+                        o.i0=aobj[j][i-1]
+                        o.i1=aobj[j][i]
+                        o.d=getDistance3d(o.p0.position, o.p1.position)
+
+                        
+
+                        o.body = this.par.phisJolt.creatObject(
+                            {t:'box',w:ww,h:ww,d:o.d*1.5,static:false, p:{x:0,y:0,z:0},color:"#99FF99", kk:4},undefined,0
+                        )
+
+
+
+                       
+                        this.arrArr[j].push(o)
+                        
+                       
+                    }
+                   
+                }
+         
+                this.upDate1()
+
+
+
+
+            }
+            function getDistance3d(p1, p2) {                    
+                return Math.sqrt(Math.pow((p1.x - p2.x), 2) + Math.pow((p1.y - p2.y), 2)+ Math.pow((p1.z - p2.z), 2));
+            };
+
+
+//BLOKTkan
+
+
+            var prosent=0.2
+            var posit=new THREE.Vector3()
+            var posit1=new THREE.Vector3()
+
+
+            var scaleX,scaleY
+
+
+            this.upDate=function(){
+                if(!this.spheres)return
+
+                for (let i = 0; i < this.spheres.length; i++) {
+                    
+
+
+                    scaleY=1/this.par.scale1
+                    posit.x=this.spheres[i].positionNax.x*this.scale
+                    posit.y=this.spheres[i].positionNax.y*this.scale*scaleY
+                    posit.z=this.spheres[i].positionNax.z*this.scale
+                    this.spheres[i].position.copy(posit)
+
+                    this.spheres[i].positionNorm.copy(this.spheres[i].positionNax)
+
+                } 
+
+
+                if(self.par.canvas){                    
+                    this.drawO(this.aobj)
+                }
+
+                this.upDate1()
+            }
+            
+            
+            var p2=new THREE.Vector3()
+            var q1
+            this.upDate1=function(){
+                if(!this.arrArr[0])return
+
+                
+                for (let j = 0; j < this.arrArr.length; j++) {
+                    for (let i = 0; i < this.arrArr[j].length; i++) {  
+                        
+
+  
+                        let p0=this.arrArr[j][i].p0.position
+                        let p1=this.arrArr[j][i].p1.position 
+                        p2.x=  (p0.x+p1.x)/2 
+                        p2.y=  (p0.y+p1.y)/2 
+                        p2.z=  (p0.z+p1.z)/2 
+
+
+                        this.arrArr[j][i].body.setPosition( p2 )
+
+                        q1=quatFromVectors(p0, p1)
+                        
+                        this.arrArr[j][i].body.setRotation( q1 )
+                    }
+                } 
+            }
+
+
+
+
+            
+            var v4=new THREE.Vector3()
+            var qr=new THREE.Quaternion()
+            var qr1=new THREE.Quaternion()
+            function quatFromVectors(v1, v2) {
+
+                v4.x=v2.x-v1.x
+                v4.y=v2.y-v1.y
+                v4.z=v2.z-v1.z
+                self.cont1.lookAt( v4.x, v4.y, v4.z)
+
+                
+               
+                return self.cont1.quaternion
+            }
+
+
+
+
+            let pp,pp1
+            let sc=0.8
+            this.corectPerspect = function(p){ 
+                pp=1-p.z/1.8 
+                p.x=p.x*pp
+
+                pp=1-p.z/2 
+                p.y=p.y*pp
+
+               
+            }
+
+
+            var v3_0=new THREE.Vector3()
+            var v3_1=new THREE.Vector3() 
+
+            var vw,vh   
+            self.ctx=self.par.ctx
+            let col1
+            this.drawO = function(a){                
+                for (var i = 0; i < a.length; i++) {
+                    col1=dcmParam.getColor(this.color,-i*25)
+                    for (var j = 0; j < a[i].length-1; j++) {
+                        
+                        this.drawOP01(a[i][j],a[i][j+1])
+                    }
+                }
+
+                
+            }     
+            this.drawOP01 = function(p0, p1){    
+                
+                v3_0.set(
+                    this.spheres[p0].positionNorm.x/2+0.5, 
+                    -this.spheres[p0].positionNorm.y/2+0.5,
+                    this.spheres[p0].positionNorm.z
+                )
+
+                v3_1.set(
+                    this.spheres[p1].positionNorm.x/2+0.5,
+                    -this.spheres[p1].positionNorm.y/2+0.5, 
+                    this.spheres[p1].positionNorm.z
+                )
+
+                vw=this.par.ww;
+                vh=this.par.hh;
+
+                
+                self.ctx.strokeStyle = col1;
+                self.ctx.lineWidth = 2;
+                self.ctx.beginPath();
+                self.ctx.moveTo(v3_0.x * vw, v3_0.y * vh);
+                self.ctx.lineTo(v3_1.x * vw, v3_1.y * vh);
+
+                self.ctx.arc(v3_1.x * vw, v3_1.y * vh,  2, 0, Math.PI * 2);
+
+                self.ctx.stroke();                
+                    
+
+            }
+
+
+
+            let ss=222
+
+            this.set = function(arr){
+                if(arr){
+                    this.init(arr)
+                }
+                if(!this.spheres)return
+
+                if(!arr){
+                    for (let i = 0; i < this.spheres.length; i++) {
+                        this.spheres[i].positionNax.set(
+                            this.spheres[i].positionStart.x,
+                            this.spheres[i].positionStart.y,
+                            this.spheres[i].positionStart.z
+                        )
+                    }
+
+                    
+                }else{
+                    for (let i = 0; i < arr.length; i++) {
+                        const lm=arr[i];
+                        const x = -(lm.x - 0.5) * 2;
+                        const y = -(lm.y - 0.5) * 2;
+                        const z = -lm.z;
+
+
+                        this.spheres[i].positionNax.set(x,y,z);
+                          
+                    }                    
+                }                
+            }
+        }
+    } 
+    
+
+
+    export class PhisTkan {
+        constructor(par, fun) {
+            this.type = "PhisTkan";
+            var self=this
+            this.par=par;
+
+            this.content3d = new THREE.Object3D();
+            self.par.content3d.add(this.content3d)
+
+            let bb=self.par.creatObject(
+                    {t:'box',w:1,h:1,d:1,static:true, p:{x:0,y:1,z:1}},
+                    new THREE.MeshPhongMaterial({color:'#00d0fd' }),
+                    0
+                )
+
+
+            this.tkan=new Tkan();
+
+            self.content3d.add(this.tkan.content3d)
+
+            this.tkan.position.set(-100,100,0)
+            this.tkan.init(bb)
+
+
+            
+             var posit=new THREE.Vector3(-50, 70, 0)
+            let rr=150
+
+            let ss=rr/(this.tkan._kw-1)
+            for (var i = 0; i < this.tkan._kw; i++) {
+                var jc = new OIMO.SphericalJointConfig();
+                jc.rigidBody1 = oWord.phNiz.body
+                jc.rigidBody2 = this.tkan.array[i].body            
+                jc.allowCollision = false;
+                jc.localAnchor1 = new OIMO.Vec3(posit.x, posit.y, posit.z-rr/2+ss*i);
+                jc.localAnchor2= new OIMO.Vec3(0, 0, 0);
+                var mouseJoint = new OIMO.SphericalJoint(jc);            
+                oWord.mJoint.add(mouseJoint)
+            }
+            const loader = new THREE.TextureLoader();
+            const texture = loader.load( 'resources/textures/1.png' );
+            texture.anisotropy=8
+            this.tkan.tChoth._material.map=texture
+
+        }
+    }
+
+
+    export class PhisJolt {
+        constructor(par, fun) {
+            this.type = "PhisJolt";
+            var self=this
+            this.par=par;
+            var jolt,physicsSystem,bodyInterface
+            var c3d=new THREE.Object3D()
+            self.par.content3d.add(c3d)
+            var boxGeometry = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1)
+            var array=[]
+
+            const loader = new THREE.TextureLoader();
+            const texture = loader.load( 'resources/textures/line.png' );
+
+            texture.repeat.x=2
+            texture.repeat.y=2
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+
+            texture.colorSpace = THREE.SRGBColorSpace;
+
+         
+            this.content3d = new THREE.Object3D();
+            self.par.content3d.add(this.content3d)
+            this.physicsSystem
+            
+            this.oWord
+
+            function initPhysics() {  
+                window.oWord=self.oWord=new OWord(self);
+                self.oWord.init()
+                self.oWord.debug =true
+                setTimeout(function(){fun("complitePhysics")},1)
+                initPhysicsWord();
+
+                self.phisTkan = new PhisTkan(self)
+            }
+          
+
+            
+            this.startB=function(w,h,d, x,y,z,tip,mass, kk){
+                var o={}
+                o.mass=0;
+                if(mass)o.mass=mass;
+
+                if(kk==undefined)kk=1
+
+                o.w=w;
+                o.h=h;
+                o.d=d; 
+                o.position={x:x,  y:y, z:z};
+                o.arrShepes = []
+                for (var i = 0; i < kk; i++) {
+                    o.arrShepes.push({ 
+                        tip:"box",
+                        w:w,
+                        h:h,
+                        d:d,
+                        //p:{x:11,y:22,z:33} 
+                        r:{x:11,y:22,z:33} 
+                    })
+                }
+
+
+                if(tip)o.arrShepes[0].tip=tip;
+            
+                let bb = oWord.setOToBody(o)
+            
+                bb.setPosition(o.position)  
+
+                
+                return bb
+            }
+            
+
+            function creatObject(o,m,mass) {
+                let shape, threeObject,mat , body     
+               
+                if(m==undefined){
+                    let cc=Math.random*0xffffff
+                    if(o.color!=undefined)cc=dcmParam.getColor(o.color, Math.round(Math.random()*50))
+                    m=new THREE.MeshPhongMaterial({color:cc,map:texture })
+                }
+
+              
+                if(mass==undefined)mass=1    
+                  
+
+                let bb1=self.startB(o.w,o.h,o.d,o.p.x,o.p.y,o.p.z,"box",mass,o.kk)
+                oWord.add(bb1)
+                bb1.mesh.material=m
+
+             
+                return bb1
+
+            }
+
+            this.creatObject=function(o,m,mm){
+
+                return creatObject(o,m,mm)
+            }
+            
+
+            function init() {
+                initPhysics()
+                
+                upDate()
+            }
+
+
+
+            function initPhysicsWord() {   
+                
+
+
+                let t1=texture.clone()
+                t1.repeat.x=5
+                t1.repeat.y=5
+                t1.wrapS = THREE.RepeatWrapping;
+                t1.wrapT = THREE.RepeatWrapping;
+                creatObject(
+                    {t:'box',w:200,h:10,d:200,static:true, p:{x:0,y:-50,z:-0.5}},
+                    new THREE.MeshPhongMaterial({color:'#4ed0fd',map:t1 }),
+                    0
+                )
+
+
+
+                piramidka({
+                    k:7,
+                    h:10,
+                    w:6,
+                    d:6,
+                    o:0,
+                    x:55,
+                    y:50,
+                    z:13,
+                    c:"#ecda39",
+                    static:false
+                }) 
+
+                piramidka({
+                    k:4,
+                    h:13,
+                    w:13,
+                    d:13,
+                    o:3,
+                    x:35,
+                    y:50,
+                    z:3,
+                    c:"#ff9a99",
+                    static:false
+                }) 
+
+            }
+
+            function piramidka(o) {
+                let k=o.k;
+                let ks=0
+                let x,y
+
+                let t2=texture.clone()
+                t2.repeat.x=4
+                t2.repeat.y=4
+                t2.wrapS = THREE.RepeatWrapping;
+                t2.wrapT = THREE.RepeatWrapping;
+                
+                
+
+                for (var j = 0; j < o.k; j++) {
+                    y=(o.h)*j
+                    for (var i = 0; i < k; i++) {
+                       x=(o.w+o.o)*i +ks-(o.k*(o.w+o.o))/2
+                        let c=dcmParam.getColor(o.c,Math.round(Math.random()*50))
+                        
+                        let mm=new THREE.MeshPhongMaterial({
+                            color:c,
+                            map:t2 
+                        })
+                        creatObject(
+                            {t:'box', w:o.w, h:o.h, d:o.d, static:o.static, p:{x:x+o.x, y:y-o.y+o.h, z:o.z}},
+                            mm,1
+                        )
+                    }
+                    k--;
+                    ks+=(o.w+o.o)/2
+
+                }
+                
+            }
+
+            var clock = new THREE.Clock();  
+            const wrapVec3 = (v) => new THREE.Vector3(v.GetX(), v.GetY(), v.GetZ());
+            const wrapQuat = (q) => new THREE.Quaternion(q.GetX(), q.GetY(), q.GetZ(), q.GetW());
+            function upDate() {
+               
+                if(jolt){
+                    var deltaTime = clock.getDelta();       
+                    jolt.Step(deltaTime*5, 1);      
+                    
+                    let body,mesh
+                    for (var i = 0; i < array.length; i++) {
+                        body=array[i];
+                        mesh=body.userData.mesh;
+                        mesh.position.copy(wrapVec3(body.GetPosition()));
+                        mesh.quaternion.copy(wrapQuat(body.GetRotation()));
+                    }           
+                }    
+
+                self.oWord.upDate()
+                self.phisTkan.tkan.upDate()
+                requestAnimationFrame( upDate );
+            }
+
+
+
+
+            init()
+
+        }
+    }
+
+
+    
+
+
+
+
+
+
+
+    init()
+    </script>
+</body>
+
+</html>
